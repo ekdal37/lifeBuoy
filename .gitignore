@@ -1,0 +1,74 @@
+# .gitignore
+
+# Ignore components
+components/
+
+# Ignore build output
+build/
+cmake-build-*/
+
+# Ignore ESP-IDF specific files
+sdkconfig
+sdkconfig.old
+
+# Ignore system files
+*.swp
+*~
+.DS_Store
+
+# Ignore IDE files
+.vscode/
+.idea/
+*.code-workspace
+
+# Ignore other common files
+*.log
+*.bak
+*.o
+*.obj
+*.a
+*.so
+*.lib
+*.dll
+*.exe
+*.out
+*.pyc
+*.pyo
+*.pyd
+*.class
+*.jar
+*.war
+*.ear
+*.tlog
+*.manifest
+*.suo
+*.user
+*.userosscache
+*.aps
+*.pch
+*.vspscc
+*.vssscc
+*_i.c
+*_p.c
+*_i.h
+*.ilk
+*.meta
+*.obj
+*.pch
+*.pdb
+*.pgc
+*.pgd
+*.rsp
+*.sbr
+*.tlb
+*.tli
+*.tlh
+*.tmp
+*.tmp_proj
+*.log
+*.vspscc
+*.vssscc
+.builds
+*.pidb
+*.svclog
+*.scc
