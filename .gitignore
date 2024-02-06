@@ -1,8 +1,9 @@
 # .gitignore
 
-# Ignore components
+# Ignore stuff
 components/
-
+managed_components/
+dependencies.lock
 # Ignore build output
 build/
 cmake-build-*/
