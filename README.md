@@ -18,6 +18,7 @@ https://github.com/sparkfun/SparkFun_Environmental_Combo_Breakout_ENS160_BME280_
 
 Libraries
 --------------
+* **[Arduino Lirary](https://github.com/espressif/arduino-esp32)** - Arduino Library
 * **[ENS160 Library](https://github.com/sparkfun/SparkFun_Indoor_Air_Quality_Sensor-ENS160_Arduino_Library)** - Arduino library for the ENS160
 * **[BME280 Library](https://github.com/sparkfun/SparkFun_BME280_Arduino_Library)** - Arduino library for the BME280
 * **[ttn-esp Library](https://github.com/manuelbl/ttn-esp32)** - The things network Library for esp32
