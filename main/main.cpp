@@ -72,7 +72,6 @@ volatile uint8_t thebuttonState = 0;
 static TheThingsNetwork ttn;
 const unsigned TX_INTERVAL = 30;
 
-
 void sendMessages(void *pvParameter)
 {
 	while (1)
@@ -122,8 +121,6 @@ void initSensor()
 			;
 	}
 
-	Serial.println("Example 1 Basic Example.");
-
 	// Reset the indoor air quality sensor's settings.
 	if (myENS.setOperatingMode(SFE_ENS160_RESET))
 		Serial.println("Ready.");
@@ -144,7 +141,6 @@ void initSensor()
 	//												and only once in sensor's lifetime.
 	// 3 - No Valid Output
 	ensStatus = myENS.getFlags();
-#include "driver/gpio.h"
 
 	Serial.print("Gas Sensor Status Flag (0 - Standard, 1 - Warm up, 2 - Initial Start Up): ");
 	Serial.println(ensStatus);
@@ -237,14 +233,19 @@ void processDataTaskFunction(void *parameter) {
 				printf(res == kTTNSuccessfulTransmission ? "Message sent.\n" : "Transmission failed.\n");
 
         // Optional delay before processing the next set of data
+        // esp_sleep_enable_timer_wakeup(TX_INTERVAL * 1000000); // Convert seconds to microseconds
+
+        mySensor.setMode(MODE_SLEEP); //Sleep for now
+        myENS.setOperatingMode(SFE_ENS160_DEEP_SLEEP);
+
+        esp_deep_sleep(TX_INTERVAL * 1000000LL);
+
+        mySensor.setMode(MODE_FORCED); //Wake up sensor and take reading
+        myENS.setOperatingMode(SFE_ENS160_STANDARD);
+
         vTaskDelay(pdMS_TO_TICKS(TX_INTERVAL * 20000));
+
     }
-}
-
-
-void loop()
-{
-	// This is a dummy function as the main code is in the tasks
 }
 
 extern "C" void app_main()
@@ -269,25 +270,25 @@ extern "C" void app_main()
 	ESP_ERROR_CHECK(err);
 
 	// Configure the SX127x pins
-	ttn.configurePins(TTN_SPI_HOST, TTN_PIN_NSS, TTN_PIN_RXTX, TTN_PIN_RST, TTN_PIN_DIO0, TTN_PIN_DIO1);
 
-	// The below line can be commented after the first run as the data is saved in NVS
-	ttn.provision(devEui, appEui, appKey);
+  ttn.configurePins(TTN_SPI_HOST, TTN_PIN_NSS, TTN_PIN_RXTX, TTN_PIN_RST, TTN_PIN_DIO0, TTN_PIN_DIO1);
 
-	// Register callback for received messages
-	ttn.onMessage(messageReceived);
+  // The below line can be commented after the first run as the data is saved in NVS
+  // ttn.provision(devEui, appEui, appKey);
 
-	pinMode(36, INPUT_PULLUP);
-	printf("Joining...\n");
-    if (ttn.join())
-    {
-        printf("Joined.\n");
-        // xTaskCreate(sendMessages, "send_messages", 1024 * 4, (void* )0, 3, nullptr);
-				sensorDataQueue = xQueueCreate(queueLength, sizeof(SensorData));
-				xTaskCreate(sensorDataTaskFunction, "sensor_data_task", 1024 * 4, NULL, 5, &sensorDataTaskHandle);
-				xTaskCreate(processDataTaskFunction, "process_data_task", 1024 * 4, NULL, 5, &processDataTaskHandle);
-				xTaskCreate(buttonTaskFunction, "button_task", 1024 * 4, NULL, 5, &buttonTaskHandle);
-    } else {
-        printf("Join failed. Goodbye\n");
-    }	
+  // Register callback for received messages
+  ttn.onMessage(messageReceived);
+
+  pinMode(36, INPUT_PULLUP);
+  printf("Joining...\n");
+  if (ttn.join()) {
+    printf("Joined.\n");
+    // xTaskCreate(sendMessages, "send_messages", 1024 * 4, (void* )0, 3, nullptr);
+		sensorDataQueue = xQueueCreate(queueLength, sizeof(SensorData));
+		xTaskCreate(sensorDataTaskFunction, "sensor_data_task", 1024 * 4, NULL, 5, &sensorDataTaskHandle);
+		xTaskCreate(buttonTaskFunction, "button_task", 1024 * 4, NULL, 5, &buttonTaskHandle);
+		xTaskCreate(processDataTaskFunction, "process_data_task", 1024 * 4, NULL, 5, &processDataTaskHandle);
+  } else {
+    printf("Join failed. Goodbye\n");
+  }	
 }
